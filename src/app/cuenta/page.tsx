@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { logoutAction } from "@/app/actions/auth";
 import { prisma } from "@/lib/prisma";
-import { requireSession } from "@/lib/admin";
+import { isAdminUser, requireSession } from "@/lib/admin";
 import { formatShortDate } from "@/lib/dates";
 import { workshopTiming } from "@/lib/workshop-status";
 
 export default async function CuentaPage() {
-  const session = await requireSession();
+  const session = await requireSession("/cuenta");
+  const admin = isAdminUser(session.user.email, session.user.role);
   const accesses = await prisma.access.findMany({
     where: { userId: session.user.id },
     include: { workshop: true },
@@ -20,6 +21,11 @@ export default async function CuentaPage() {
           <p className="kicker">Tu espacio</p>
           <h1 className="h1 mt-3">Hola, {session.user.name}</h1>
           <p className="lead mt-3">Los workshops que ya son tuyos.</p>
+          {admin ? (
+            <Link href="/admin" className="mt-4 inline-block text-[14px] font-semibold text-accent">
+              Ir al panel de workshops
+            </Link>
+          ) : null}
         </div>
         <form action={logoutAction}>
           <button className="btn-ghost" type="submit">

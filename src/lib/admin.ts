@@ -14,16 +14,18 @@ export function isAdminUser(email?: string | null, role?: string | null) {
   return adminEmails().includes(email.toLowerCase());
 }
 
-export async function requireSession() {
+export async function requireSession(callbackUrl = "/cuenta") {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) {
+    redirect(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+  }
   return session;
 }
 
 export async function requireAdmin() {
-  const session = await requireSession();
+  const session = await requireSession("/admin");
   if (!isAdminUser(session.user.email, session.user.role)) {
-    redirect("/");
+    redirect("/login?error=admin&callbackUrl=/admin");
   }
   return session;
 }

@@ -53,7 +53,8 @@ async function main() {
       coverPath: "/covers/voz.svg",
       videoUrl: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
       locationType: "online",
-      meetOrPlace: "El enlace de la sala llega al reservar tu lugar.",
+      joinKind: "google_meet",
+      meetOrPlace: "https://meet.google.com/voz-en-vivo",
       whatsappUrl: "https://wa.me/593999000000",
       isFree: true,
       ctaLabel: "Reservar mi lugar",
@@ -72,6 +73,7 @@ async function main() {
             role: "Estratega de posicionamiento",
             bio: "Acompaña a consultoras independientes a vender criterio, no horas.",
             photoPath: "/hosts/maria.svg",
+            sharePercent: 40,
             sortOrder: 0,
           },
           {
@@ -79,6 +81,7 @@ async function main() {
             role: "Facilitador",
             bio: "Diseña sesiones cortas que se pueden aplicar el mismo día.",
             photoPath: "/hosts/leo.svg",
+            sharePercent: 20,
             sortOrder: 1,
           },
         ],
@@ -86,7 +89,7 @@ async function main() {
     },
   });
 
-  await prisma.workshop.create({
+  const lanzamiento = await prisma.workshop.create({
     data: {
       title: "Calendario de lanzamiento en 90 minutos",
       slug: "calendario-lanzamiento",
@@ -98,7 +101,8 @@ async function main() {
       timezone: "America/Guayaquil",
       coverPath: "/covers/lanzamiento.svg",
       locationType: "online",
-      meetOrPlace: "Sala en línea. El enlace se muestra al confirmar el pago.",
+      joinKind: "google_meet",
+      meetOrPlace: "https://meet.google.com/cal-lanza",
       whatsappUrl: "https://wa.me/593999000000",
       extraLink: "https://example.com/temario-lanzamiento",
       isFree: false,
@@ -121,6 +125,7 @@ async function main() {
             name: "María Solano",
             role: "Estratega de posicionamiento",
             photoPath: "/hosts/maria.svg",
+            sharePercent: 70,
             sortOrder: 0,
           },
         ],
@@ -142,6 +147,8 @@ async function main() {
       videoUrl: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
       replayUrl: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
       locationType: "online",
+      joinKind: "google_meet",
+      meetOrPlace: "https://meet.google.com/luna-replay",
       isFree: false,
       priceAmount: 19,
       currency: "USD",
@@ -163,6 +170,7 @@ async function main() {
             role: "Facilitadora",
             bio: "Diseña prácticas cortas para gente que ya está cansada de los tableros.",
             photoPath: "/hosts/camila.svg",
+            sharePercent: 50,
             sortOrder: 0,
           },
         ],
@@ -183,6 +191,8 @@ async function main() {
       coverPath: "/covers/lunes.svg",
       replayUrl: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
       locationType: "online",
+      joinKind: "google_meet",
+      meetOrPlace: "https://meet.google.com/lunes-criterio",
       whatsappUrl: "https://wa.me/593999000000",
       isFree: true,
       ctaLabel: "Ver el replay",
@@ -207,20 +217,32 @@ async function main() {
     },
   });
 
-  await prisma.access.create({
-    data: {
-      userId: ana.id,
-      workshopId: luna.id,
-      source: "pago",
-    },
-  });
+  const extra = [];
+  for (const [i, name] of ["Sofía Peña", "Diego Mora", "Elena Cruz", "Pablo Ríos"].entries()) {
+    extra.push(
+      await prisma.user.create({
+        data: {
+          email: `persona${i + 1}@example.com`,
+          name,
+          passwordHash: anaHash,
+          role: "member",
+        },
+      }),
+    );
+  }
 
-  await prisma.access.create({
-    data: {
-      userId: admin.id,
-      workshopId: voz.id,
-      source: "admin",
-    },
+  await prisma.access.createMany({
+    data: [
+      { userId: ana.id, workshopId: luna.id, source: "pago" },
+      { userId: extra[0].id, workshopId: luna.id, source: "pago" },
+      { userId: extra[1].id, workshopId: luna.id, source: "pago" },
+      { userId: extra[2].id, workshopId: luna.id, source: "optin" },
+      { userId: extra[0].id, workshopId: lanzamiento.id, source: "pago" },
+      { userId: extra[1].id, workshopId: lanzamiento.id, source: "pago" },
+      { userId: extra[3].id, workshopId: lanzamiento.id, source: "pago" },
+      { userId: admin.id, workshopId: voz.id, source: "admin" },
+      { userId: extra[2].id, workshopId: voz.id, source: "optin" },
+    ],
   });
 
   console.log("Seed listo: 4 workshops, admin@encuentros.local y ana@example.com");

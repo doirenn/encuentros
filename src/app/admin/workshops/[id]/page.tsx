@@ -18,7 +18,7 @@ export default async function EditWorkshopPage({
   if (!workshop) notFound();
 
   return (
-    <div className="container-app py-12">
+    <div className="py-2">
       <p className="kicker">Panel</p>
       <h1 className="h1 mt-3 mb-8">Editar workshop</h1>
       <WorkshopForm
@@ -34,6 +34,7 @@ export default async function EditWorkshopPage({
           coverPath: workshop.coverPath ?? "",
           videoUrl: workshop.videoUrl ?? "",
           locationType: workshop.locationType,
+          joinKind: workshop.joinKind,
           meetOrPlace: workshop.meetOrPlace ?? "",
           whatsappUrl: workshop.whatsappUrl ?? "",
           extraLink: workshop.extraLink ?? "",
@@ -51,6 +52,7 @@ export default async function EditWorkshopPage({
             role: h.role ?? "",
             bio: h.bio ?? "",
             photoPath: h.photoPath ?? "",
+            sharePercent: String(h.sharePercent ?? 0),
           })),
         }}
       />

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { formatPrice, formatShortDate, formatTime } from "@/lib/dates";
+import { LocalEventTime } from "@/components/LocalEventTime";
+import { formatPrice } from "@/lib/dates";
 import { workshopTiming } from "@/lib/workshop-status";
 
 export type CardWorkshop = {
@@ -52,11 +53,10 @@ export function WorkshopCard({
         <h2 className="text-[20px] font-bold leading-snug tracking-tight text-ink">
           {workshop.title}
         </h2>
-        <p className="caption">
-          {formatShortDate(workshop.startsAt, workshop.timezone)} ·{" "}
-          {formatTime(workshop.startsAt, workshop.timezone)}
-          {workshop.hosts[0] ? ` · ${workshop.hosts[0].name}` : ""}
-        </p>
+        <div className="caption">
+          <LocalEventTime date={workshop.startsAt} eventTz={workshop.timezone} compact />
+          {workshop.hosts[0] ? <span> · {workshop.hosts[0].name}</span> : null}
+        </div>
         <p className="text-[14px] font-semibold text-ink">
           {owned ? "Ya lo tienes" : archive && !workshop.isFree ? `Replay · ${price}` : price}
         </p>

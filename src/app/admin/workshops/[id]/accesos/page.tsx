@@ -20,7 +20,7 @@ export default async function AccesosPage({
   if (!workshop) notFound();
 
   return (
-    <div className="container-app py-12">
+    <div className="py-2">
       <p className="kicker">Panel</p>
       <h1 className="h1 mt-3">Accesos · {workshop.title}</h1>
       {error === "nouser" ? (

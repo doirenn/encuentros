@@ -29,6 +29,7 @@ model Workshop {
   coverPath    String?
   videoUrl     String?
   locationType String      @default("online")
+  joinKind     String      @default("google_meet")
   meetOrPlace  String?
   whatsappUrl  String?
   extraLink    String?
@@ -62,8 +63,9 @@ model Host {
   name       String
   photoPath  String?
   role       String?
-  bio        String?
-  sortOrder  Int      @default(0)
+  bio          String?
+  sharePercent Float    @default(0)
+  sortOrder    Int      @default(0)
 }
 
 model Access {

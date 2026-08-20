@@ -17,6 +17,7 @@ type Props = {
     ctaLabel: string | null;
     replayUrl: string | null;
     meetOrPlace: string | null;
+    joinKind?: string | null;
   };
   timing: WorkshopTiming;
   loggedIn: boolean;
@@ -65,14 +66,33 @@ export function AccessCard({
   }
 
   if (hasAccess) {
+    const joinKind = workshop.joinKind || "google_meet";
+    const joinUrl = workshop.meetOrPlace;
+    const isMeet = joinKind === "google_meet";
+    const canJoin = Boolean(joinUrl) && (isMeet || joinKind === "link");
     return (
       <aside data-tour="ficha" className="card bg-surface p-6">
         <h2 className="text-[22px] font-bold tracking-tight">Ya estás dentro</h2>
-        <p className="mt-2 text-[15px] text-muted">
-          {workshop.meetOrPlace || "El enlace de la sala aparece aquí el día del encuentro."}
-        </p>
         {timing === "live" ? (
           <p className="mt-3 text-[14px] font-semibold text-accent">Está ocurriendo ahora.</p>
+        ) : (
+          <p className="mt-2 text-[15px] text-muted">
+            {canJoin
+              ? isMeet
+                ? "Entra a la sala con Google Meet a la hora del evento."
+                : "Usa este enlace a la hora del evento."
+              : joinKind === "place"
+                ? joinUrl || "El lugar se confirma aquí."
+                : "El enlace de Meet aparece aquí cuando esté listo."}
+          </p>
+        )}
+        {canJoin ? (
+          <a className="btn-cta mt-5" href={joinUrl ?? "#"} target="_blank" rel="noreferrer">
+            {isMeet ? "Unirse con Google Meet" : "Unirse al vivo"}
+          </a>
+        ) : null}
+        {joinKind === "place" && joinUrl ? (
+          <p className="mt-4 text-[15px] font-medium">{joinUrl}</p>
         ) : null}
       </aside>
     );

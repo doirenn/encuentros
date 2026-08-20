@@ -46,11 +46,14 @@ export async function SiteHeader() {
               Entrar
             </Link>
           )}
-          {admin ? (
-            <Link href="/admin" className="rounded-xl px-2 py-2 text-accent hover:bg-surface sm:px-3">
-              Admin
-            </Link>
-          ) : null}
+          <Link
+            href="/admin"
+            className={`rounded-xl px-2 py-2 hover:bg-surface sm:px-3 ${
+              admin ? "font-semibold text-accent" : "text-ink"
+            }`}
+          >
+            Admin
+          </Link>
         </nav>
       </div>
     </header>

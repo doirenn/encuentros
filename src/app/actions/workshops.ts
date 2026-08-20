@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin";
 import { slugify } from "@/lib/slug";
 import { sanitizePaymentEmbed } from "@/lib/payment";
+import { isGoogleMeetUrl, zonedInputToDate } from "@/lib/timezone";
 
 async function saveUpload(file: File | null, folder: "covers" | "hosts") {
   if (!file || file.size === 0) return null;
@@ -26,13 +27,14 @@ type HostInput = {
   role: string;
   bio: string;
   photoPath: string;
+  sharePercent?: string | number;
 };
 
 export async function saveWorkshopAction(formData: FormData) {
   await requireAdmin();
   const id = String(formData.get("id") ?? "");
   const title = String(formData.get("title") ?? "").trim();
-  if (!title) redirect("/admin?error=titulo");
+  if (!title) redirect("/admin/workshops/new");
 
   let slug = slugify(String(formData.get("slug") ?? "") || title);
   const existingSlug = await prisma.workshop.findUnique({ where: { slug } });
@@ -70,18 +72,26 @@ export async function saveWorkshopAction(formData: FormData) {
     .map((line) => line.trim())
     .filter(Boolean);
 
+  const timezone = String(formData.get("timezone") ?? "America/Guayaquil");
+  const joinKind = String(formData.get("joinKind") ?? "google_meet");
+  let meetOrPlace = String(formData.get("meetOrPlace") ?? "").trim() || null;
+  if (joinKind === "google_meet" && meetOrPlace && !isGoogleMeetUrl(meetOrPlace)) {
+    meetOrPlace = meetOrPlace.startsWith("http") ? meetOrPlace : `https://meet.google.com/${meetOrPlace}`;
+  }
+
   const data = {
     title,
     slug,
     kicker: String(formData.get("kicker") ?? "").trim() || "Workshop",
     description: String(formData.get("description") ?? "").trim(),
-    startsAt: new Date(String(formData.get("startsAt"))),
-    endsAt: new Date(String(formData.get("endsAt"))),
-    timezone: String(formData.get("timezone") ?? "America/Guayaquil"),
+    startsAt: zonedInputToDate(String(formData.get("startsAt")), timezone),
+    endsAt: zonedInputToDate(String(formData.get("endsAt")), timezone),
+    timezone,
     coverPath: coverUpload ?? coverFallback,
     videoUrl: String(formData.get("videoUrl") ?? "").trim() || null,
     locationType: String(formData.get("locationType") ?? "online"),
-    meetOrPlace: String(formData.get("meetOrPlace") ?? "").trim() || null,
+    joinKind,
+    meetOrPlace,
     whatsappUrl: String(formData.get("whatsappUrl") ?? "").trim() || null,
     extraLink: String(formData.get("extraLink") ?? "").trim() || null,
     isFree,
@@ -124,6 +134,7 @@ export async function saveWorkshopAction(formData: FormData) {
         role: host.role.trim() || null,
         bio: host.bio.trim() || null,
         photoPath: host.photoPath.trim() || null,
+        sharePercent: Math.max(0, Number(host.sharePercent || 0)),
         sortOrder,
       })),
     });
@@ -136,5 +147,5 @@ export async function deleteWorkshopAction(formData: FormData) {
   await requireAdmin();
   const id = String(formData.get("id") ?? "");
   await prisma.workshop.delete({ where: { id } });
-  redirect("/admin");
+  redirect("/admin/workshops");
 }

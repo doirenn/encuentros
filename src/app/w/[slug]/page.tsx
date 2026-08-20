@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import { AccessCard } from "@/components/AccessCard";
+import { LocalEventTime } from "@/components/LocalEventTime";
 import { MediaBlock } from "@/components/MediaBlock";
 import { auth } from "@/auth";
-import { formatWorkshopDate } from "@/lib/dates";
 import { prisma } from "@/lib/prisma";
 import { parseVideoEmbed } from "@/lib/video";
 import { workshopTiming } from "@/lib/workshop-status";
@@ -58,7 +58,7 @@ export default async function WorkshopPage({
         <h1 className="h1 mt-4">{workshop.title}</h1>
         <p className="lead mt-4">{workshop.description}</p>
         <p className="mt-4 text-[14px] font-medium text-ink">
-          {formatWorkshopDate(workshop.startsAt, workshop.timezone)} · hora de Guayaquil
+          <LocalEventTime date={workshop.startsAt} eventTz={workshop.timezone} />
         </p>
       </div>
 
@@ -153,7 +153,8 @@ export default async function WorkshopPage({
             : workshop.locationType === "hibrido"
               ? "Híbrido"
               : "En línea"}
-          {workshop.meetOrPlace ? ` · ${workshop.meetOrPlace}` : ""}
+          {workshop.joinKind === "google_meet" ? " · Google Meet" : ""}
+          {workshop.joinKind === "place" && workshop.meetOrPlace ? ` · ${workshop.meetOrPlace}` : ""}
         </p>
       </div>
     </div>

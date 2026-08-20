@@ -14,13 +14,21 @@ function normalizeEmail(email: string) {
 export async function loginAction(formData: FormData) {
   const email = normalizeEmail(String(formData.get("email") ?? ""));
   const password = String(formData.get("password") ?? "");
-  const callbackUrl = String(formData.get("callbackUrl") ?? "/cuenta");
+  const requested = String(formData.get("callbackUrl") ?? "");
+  const user = await prisma.user.findUnique({ where: { email } });
+  const isAdmin = user?.role === "admin" || adminEmails().includes(email);
+  const callbackUrl =
+    requested && requested !== "/cuenta"
+      ? requested
+      : isAdmin
+        ? "/admin"
+        : "/cuenta";
 
   try {
     await signIn("credentials", {
       email,
       password,
-      redirectTo: callbackUrl || "/cuenta",
+      redirectTo: callbackUrl,
     });
   } catch (error) {
     if (error instanceof AuthError) {
@@ -69,6 +77,7 @@ export async function registerAction(formData: FormData) {
   }
 }
 
-export async function logoutAction() {
-  await signOut({ redirectTo: "/" });
+export async function logoutAction(formData?: FormData) {
+  const next = String(formData?.get("next") ?? "/");
+  await signOut({ redirectTo: next || "/" });
 }
