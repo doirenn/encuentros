@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         String   @default("member")
+  createdAt    DateTime @default(now())
+  accesses     Access[]
+}
+
+model Workshop {
+  id           String      @id @default(cuid())
+  title        String
+  slug         String      @unique
+  kicker       String
+  description  String
+  startsAt     DateTime
+  endsAt       DateTime
+  timezone     String      @default("America/Guayaquil")
+  coverPath    String?
+  videoUrl     String?
+  locationType String      @default("online")
+  meetOrPlace  String?
+  whatsappUrl  String?
+  extraLink    String?
+  isFree       Boolean     @default(true)
+  priceAmount  Float?
+  currency     String      @default("USD")
+  paymentMode  String?
+  paymentValue String?
+  replayUrl    String?
+  ctaLabel     String?
+  status       String      @default("published")
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  highlights   Highlight[]
+  hosts        Host[]
+  accesses     Access[]
+}
+
+model Highlight {
+  id         String   @id @default(cuid())
+  workshopId String
+  workshop   Workshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+  text       String
+  sortOrder  Int      @default(0)
+}
+
+model Host {
+  id         String   @id @default(cuid())
+  workshopId String
+  workshop   Workshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+  name       String
+  photoPath  String?
+  role       String?
+  bio        String?
+  sortOrder  Int      @default(0)
+}
+
+model Access {
+  id         String   @id @default(cuid())
+  userId     String
+  workshopId String
+  source     String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workshop   Workshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workshopId])
+}

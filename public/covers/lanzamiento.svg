@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1460" height="752" viewBox="0 0 1460 752" fill="none">
+  <rect width="1460" height="752" fill="#2C6A64"/>
+  <rect x="90" y="90" width="1280" height="140" fill="#F5F5F3"/>
+  <rect x="90" y="270" width="400" height="392" fill="#171717"/>
+  <rect x="530" y="270" width="400" height="392" fill="#F5F5F3"/>
+  <rect x="970" y="270" width="400" height="392" fill="#171717"/>
+  <text x="120" y="175" fill="#171717" font-family="system-ui, sans-serif" font-size="36" font-weight="700">90 minutos. Un calendario.</text>
+</svg>

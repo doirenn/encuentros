@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1460" height="752" viewBox="0 0 1460 752" fill="none">
+  <rect width="1460" height="752" fill="#0E2E2B"/>
+  <circle cx="730" cy="380" r="180" fill="none" stroke="#F5F5F3" stroke-width="8"/>
+  <circle cx="790" cy="340" r="70" fill="#F5F5F3"/>
+  <text x="730" y="640" fill="#F5F5F3" font-family="system-ui, sans-serif" font-size="28" font-weight="600" text-anchor="middle">Nueva luna</text>
+</svg>
